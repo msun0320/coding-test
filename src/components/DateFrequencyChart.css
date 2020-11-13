@@ -21,8 +21,8 @@
 
 @media (max-width: 768px) {
 	.DateFrequencyChart {
-		display: block;
 		width: 80vw;
+		display: block;
 	}
 
 	.datepicker {

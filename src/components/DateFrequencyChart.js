@@ -2,29 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import './DateFrequencyChart.css';
 
-const DateFrequencyChart = ({ locationID, tokenID, LOCATION_API, fetchData }) => {
+const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) => {
 	const [startDate, setStartDate] = useState('2020-05-01');
-	const [endDate, setEndDate] = useState('2020-05-02');
+	const [endDate, setEndDate] = useState('2020-05-10');
 	const [dateRange, setDateRange] = useState([]);
-	const [data, setData] = useState({});
 	const [alerts, setAlerts] = useState([]);
+	const [data, setData] = useState({});
 
 	const selector = '[ADAM]';
-
 	const ALERTS_API = `${LOCATION_API}/${locationID}/alerts?start_date=${startDate}&end_date=${endDate}&selector=${selector}`;
 
-	const handleStartDateChange = e => setStartDate(e.target.value);
-
-	const handleEndDateChange = e => setEndDate(e.target.value);
-
-	useEffect(() => {
-		if (locationID) {
-			fetchData(ALERTS_API, {headers: {Authorization: `Bearer ${tokenID}`}})
-				.then(data => setAlerts(data.data));		
-		}
-	}, [ALERTS_API]);
-
-	useEffect(() => {
+	// generateRange accepts 2 dates (yyyy-mm-dd)
+	// and returns an array of dates between the 2 input dates.
+	const generateRange = (startDate, endDate) => {
 		const range = [];
 		const dateMove = new Date(startDate);
 		let strDate = startDate;
@@ -34,19 +24,52 @@ const DateFrequencyChart = ({ locationID, tokenID, LOCATION_API, fetchData }) =>
 		    range.push(strDate);
 		    dateMove.setDate(dateMove.getDate()+1);
 		};
-	
+
+		return range;
+	};
+
+	// convertArrToObj accepts an array and returns an object
+	// which its keys are elements in the array, its values are set to 0.
+	const convertArrToObj = arr => arr.reduce((a, b) => (a[b] = 0, a), {});
+
+	// formarUnixTime formats a unix time into yyyy-mm-dd.
+	const formatUnixTime = unixTime => {
+		const dateObj = new Date(unixTime * 1000);
+		const localTime = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString();
+
+		return localTime.slice(0, 10);
+	};
+
+	// countEventsByDate counts the number of events per day.
+	const countEventsByDate = (eventsArr, frequencyObj) => {
+		for (let i = 0; i < eventsArr.length; i++) {
+			const key = formatUnixTime(eventsArr[i].timestamp);
+
+			frequencyObj[key]++;
+		}
+
+		return frequencyObj;
+	};
+
+	// fetch events data.
+	useEffect(() => {
+		if (locationID) {
+			fetchData(ALERTS_API, {headers: {Authorization: `Bearer ${tokenID}`}})
+				.then(data => setAlerts(data.data));		
+		}
+	}, [ALERTS_API]);
+
+	// generate date range.
+	useEffect(() => {
+		const range = generateRange(startDate, endDate);
+
 		setDateRange(range);
 	}, [startDate, endDate]);
 
+	// count the number of events per day and set data that will be passed into bar chart.
 	useEffect(() => {
-		const frequencyObj = dateRange.reduce((a, b) => (a[b] = 0, a), {});
-
-		for (let i = 0; i < alerts.length; i++) {
-			const gmtKey = new Date(alerts[i].timestamp * 1000);
-			const key = new Date(gmtKey.getTime() - (gmtKey.getTimezoneOffset() * 60000)).toISOString();
-
-			frequencyObj[key.slice(0, 10)]++;
-		}
+		let frequencyObj = convertArrToObj(dateRange);
+		frequencyObj = countEventsByDate(alerts, frequencyObj);
 
 		setData({
 			labels: Object.keys(frequencyObj),
@@ -59,6 +82,10 @@ const DateFrequencyChart = ({ locationID, tokenID, LOCATION_API, fetchData }) =>
 			]
 		});
 	}, [alerts]);
+
+	const handleStartDateChange = e => setStartDate(e.target.value);
+
+	const handleEndDateChange = e => setEndDate(e.target.value);
 
 	return (
 		<div className='DateFrequencyChart'>

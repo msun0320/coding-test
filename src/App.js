@@ -39,7 +39,7 @@ const App = () => {
 
     return (
     	<div className="App">
-        	<DateFrequencyChart locationID={locationID} tokenID={tokenID} LOCATION_API={LOCATION_API} fetchData={fetchData} />
+        	<DateFrequencyChart tokenID={tokenID} locationID={locationID} LOCATION_API={LOCATION_API} fetchData={fetchData} />
     	</div>
     );
 };
