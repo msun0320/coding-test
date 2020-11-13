@@ -61,7 +61,7 @@ const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) =>
 
 	// generate date range.
 	useEffect(() => {
-		const range = generateRange(startDate, endDate);
+		const range = startDate ? generateRange(startDate, endDate) : [];
 
 		setDateRange(range);
 	}, [startDate, endDate]);
