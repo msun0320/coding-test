@@ -1,0 +1,11 @@
+.App {
+	height: 90vh;
+	display: grid;
+	align-items: center;
+}
+
+@media (max-width: 768px) {
+	.App {
+		height: auto;
+	}	
+}
