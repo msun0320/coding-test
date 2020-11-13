@@ -1,3 +1,5 @@
+// I did not finish learning how to do unit testing for React components today,
+// so I wrote some basic testing as if I did before using Jasmine to test pure functions.
 describe('generateRange', function() {
   it('returns an array of dates between 2 dates', function() {
     expect(generateRange('2020-05-01', '2020-05-10')).toEqual([
