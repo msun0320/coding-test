@@ -61,9 +61,15 @@ const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) =>
 
 	// generate date range.
 	useEffect(() => {
-		const range = startDate ? generateRange(startDate, endDate) : [];
+		const startDateObj = new Date(startDate);
+		const endDateObj = new Date(endDate);
+		const yearlyDifference = Math.abs(startDateObj.getFullYear() - endDateObj.getFullYear());
 
-		setDateRange(range);
+		if (startDateObj.getFullYear() && startDateObj.getMonth() && startDateObj.getDate() && yearlyDifference < 100) {
+			const range = generateRange(startDate, endDate);
+
+			setDateRange(range);
+		}
 	}, [startDate, endDate]);
 
 	// count the number of events per day and set data that will be passed into bar chart.
@@ -91,12 +97,12 @@ const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) =>
 		<div className='DateFrequencyChart'>
 			<div className='datepicker'>
 				<label htmlFor="startDate">From</label><br />
-				<input type='date' value={startDate} onChange={handleStartDateChange} /><br />
+				<input type='date' value={startDate} placeholder='yyyy-mm-dd' onChange={handleStartDateChange} /><br />
 			</div>
 
 			<div className='datepicker'>
 				<label htmlFor="endDate">To</label><br />
-				<input type='date' value={endDate} onChange={handleEndDateChange} /><br />	
+				<input type='date' value={endDate} placeholder='yyyy-mm-dd' onChange={handleEndDateChange} /><br />	
 			</div>
 			
 			<div className='Bar'>
