@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import './DateFrequencyChart.css';
 
 const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) => {
@@ -82,8 +82,7 @@ const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) =>
 			datasets: [
 				{
 					label: 'Number of events',
-					data: Object.values(frequencyObj),
-					backgroundColor: 'rgba(32, 121, 199, 0.2)'
+					data: Object.values(frequencyObj)
 				}
 			]
 		});
@@ -106,7 +105,7 @@ const DateFrequencyChart = ({ tokenID, locationID, LOCATION_API, fetchData }) =>
 			</div>
 			
 			<div className='Bar'>
-				<Bar data={data} />
+				<Line data={data} />
 			</div>
 		</div>
 	);
